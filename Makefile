@@ -5,23 +5,23 @@ TST_IDX = test/index.js
 BUNDLE_STD ?= node "node_modules/webpack/bin/webpack.js" --progress
 BUNDLE_DEV ?= node "node_modules/webpack-dev-server/bin/webpack-dev-server.js" --port 9999 --progress
 
-dist/rx-player.js: $(SRC_IDX) $(SRC)
+dist/one-player-core.js: $(SRC_IDX) $(SRC)
 	@$(BUNDLE_STD) $< $@
 
-dist/rx-player.min.js: $(SRC_IDX) $(SRC)
-	@CP_PROD=true $(BUNDLE_STD) $< dist/rx-player.tmp.js
-	@closure-compiler --language_in=ECMASCRIPT5 --compilation_level SIMPLE_OPTIMIZATIONS --js dist/rx-player.tmp.js > $@
-	@rm dist/rx-player.tmp.js
+dist/one-player-core.min.js: $(SRC_IDX) $(SRC)
+	@CP_PROD=true $(BUNDLE_STD) $< dist/one-player-core.tmp.js
+	@closure-compiler --language_in=ECMASCRIPT5 --compilation_level SIMPLE_OPTIMIZATIONS --js dist/one-player-core.tmp.js > $@
+	@rm dist/one-player-core.tmp.js
 
-all: dist/rx-player.js dist/rx-player.min.js
+all: dist/one-player-core.js dist/one-player-core.min.js
 
-build: dist/rx-player.js
+build: dist/one-player-core.js
 
-min: dist/rx-player.min.js
+min: dist/one-player-core.min.js
 
 clean:
-	@rm -f dist/rx-player.js
-	@rm -f dist/rx-player.min.js
+	@rm -f dist/one-player-core.js
+	@rm -f dist/one-player-core.min.js
 
 update-version:
 	@./bin/update-version
@@ -33,7 +33,7 @@ lint:
 	@eslint $(SRC)
 
 dev: $(SRC_IDX) $(SRC)
-	@$(BUNDLE_STD) -w $< dist/rx-player.js
+	@$(BUNDLE_STD) -w $< dist/one-player-core.js
 
 demo:
 	@$(BUNDLE_STD) --config webpack-demo.config.js -w

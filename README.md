@@ -1,15 +1,15 @@
-rx-player
-=========
+one-player-core
+===============
 
 Latest release: v2.0.0-alpha5
 
-The rx-player is a Javascript library implementic a generic streaming video player using HTML5 Media Source and Encrypted Media extensions. It is entirely written in reactive-programming with ECMAScript 6.
+The one-player-core is a Javascript library implementic a generic streaming video player using HTML5 Media Source and Encrypted Media extensions. It is entirely written in reactive-programming with ECMAScript 6.
 
 It comes with a support for DASH and SmoothStreaming transports.
 
 ## API
 
-[Read the detailed API](//github.com/canalplus/rx-player/blob/master/API.md).
+[Read the detailed API](//github.com/canalplus/one-player-core/blob/master/API.md).
 
 ## Why a new player ? Why Rx ?
 
@@ -19,7 +19,7 @@ Many current video player implementations rely on classical object-oriented hier
 
 Rx on the contrary provides gracious interfaces and operators to compose asynchronous tasks together by representating changing states as observable stream of values. It also comes with a **cancelation** contract so that every asynchronous side-effect can be properly disposed when discarded by the system (this is still [a controversial issue in the JS community](https://github.com/whatwg/fetch/issues/27)).
 
-This allowed us to implement some nice features quite easily. For instance, because in the rx-player all asynchronous tasks are encapsulated in observable data-structures, we were able to add a transparent [retry system](https://github.com/canalplus/canal-js-utils/blob/master/rx-ext.js#L73-L100) with a simple observable operator to declaratively handle any failure and replay the whole process.
+This allowed us to implement some nice features quite easily. For instance, because in the one-player-core all asynchronous tasks are encapsulated in observable data-structures, we were able to add a transparent [retry system](https://github.com/canalplus/canal-js-utils/blob/master/rx-ext.js#L73-L100) with a simple observable operator to declaratively handle any failure and replay the whole process.
 
 Another example is the way we abstracted our transport layer into an observable pipeline, allowing us to support different type of streaming systems with its own asynchronous specifities. And because Rx is message-driven, this encapsulation allows us isolate the transport I/O into a WebWorker without any effort, or add an offline support for any pipeline implementation.
 
@@ -36,7 +36,7 @@ To launch the demo yourself, run `make demo` and start a local webserver from th
 ```sh
 python -m SimpleHTTPServer 8080 # open http://localhost:8080/demo
 ```
-[View online Demo](http://canalplus.github.io/rx-player/)
+[View online Demo](http://canalplus.github.io/one-player-core/)
 
 ## Installation
 
@@ -44,13 +44,13 @@ The fastest way to use our player is to add this repository as a dependency of
 your `package.json` dependency field:
 
 ```
-npm install --save https://github.com/canalplus/rx-player/
+npm install --save https://github.com/canalplus/one-player-core/
 ```
 
-You can then either use directly the `dist/rx-player.js` file:
+You can then either use directly the `dist/one-player-core.js` file:
 
 ```html
-<script src="node_modules/rx-player/dist/rx-player.js"></script>
+<script src="node_modules/one-player-core/dist/one-player-core.js"></script>
 ```
 
 Or with tools like [Browserify](http://browserify.org/) or
@@ -69,16 +69,16 @@ For the demo only:
 
 ## Build
 
-A build is directly included at `dist/rx-player.js` directory if you don't
+A build is directly included at `dist/one-player-core.js` directory if you don't
 want to build it yourself.
 
 To bundle the application yourself, we use `make`. The important task to know:
 
 ```sh
 make clean
-# build dist/rx-player.js
+# build dist/one-player-core.js
 make build
-# build dist/rx-player.min.js
+# build dist/one-player-core.min.js
 make min
 # build and watch file change for rebuild
 make dev

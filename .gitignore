@@ -3,5 +3,5 @@ node_modules
 *.keys
 
 dist/*
-!dist/rx-player.js
-!dist/rx-player.min.js
+!dist/one-player-core.js
+!dist/one-player-core.min.js
