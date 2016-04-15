@@ -12113,7 +12113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1194624
 	    videoElement.preload = "auto";
 
-	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha5";
+	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha6";
 	    _this.video = videoElement;
 
 	    // fullscreen change
