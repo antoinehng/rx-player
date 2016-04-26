@@ -12256,7 +12256,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1194624
 	    videoElement.preload = "auto";
 
-	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha7";
+	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha8";
 	    _this.video = videoElement;
 
 	    // fullscreen change
@@ -13077,14 +13077,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function createAndPlugMediaSource(url, video) {
 	    return Observable.create(function (observer) {
-	      if (!MediaSource_) {
-	        throw new MediaError("MEDIA_SOURCE_NOT_SUPPORTED", null, true);
-	      }
-
 	      var mediaSource = void 0,
 	          objectURL = void 0;
 
 	      if (pipelines.requiresMediaSource()) {
+	        if (!MediaSource_) {
+	          throw new MediaError("MEDIA_SOURCE_NOT_SUPPORTED", null, true);
+	        }
 	        mediaSource = new MediaSource_();
 	        objectURL = URL.createObjectURL(mediaSource);
 	      } else {
