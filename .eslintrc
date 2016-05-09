@@ -68,6 +68,7 @@
     // style guide: Always use brackets, even when optional.
     'curly': [1, 'all'],
 
+    'no-case-declarations': 0,
     'no-var': 1,
     'prefer-const': 1,
 
