@@ -19,7 +19,6 @@ const { Subscription } = require("rxjs/Subscription");
 const { Subject } = require("rxjs/Subject");
 const { BehaviorSubject } = require("rxjs/BehaviorSubject");
 const { combineLatest } = require("rxjs/observable/combineLatest");
-debugger;
 const { on } = require("../utils/rx-utils");
 const EventEmitter = require("../utils/eventemitter");
 const debugPane = require("../utils/debug");
