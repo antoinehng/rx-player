@@ -1,7 +1,7 @@
 one-player-core
 ===============
 
-Latest release: v2.0.0-alpha9
+Latest release: v2.0.0-alpha10
 
 The one-player-core is a Javascript library implementic a generic streaming video player using HTML5 Media Source and Encrypted Media extensions. It is entirely written in reactive-programming with ECMAScript 6.
 
