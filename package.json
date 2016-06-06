@@ -37,14 +37,18 @@
     "file-loader": "^0.8.1",
     "jsx-loader": "^0.13.1",
     "lodash": "4.11.1",
-    "mocha": "^2.0.1",
+    "mkdirp": "^0.5.1",
+    "mocha": "^2.5.3",
     "mocha-loader": "^0.7.0",
     "raw-loader": "^0.5.1",
     "react": "^0.13.1",
+    "rimraf": "^2.5.2",
     "script-loader": "^0.6.1",
+    "selenium-webdriver": "^2.53.2",
     "style-loader": "^0.13.0",
     "url-loader": "^0.5.5",
     "webpack": "^1.12.12",
-    "webpack-dev-server": "^1.14.1"
+    "webpack-dev-server": "^1.14.1",
+    "xunit-file": "0.0.9"
   }
 }

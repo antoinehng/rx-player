@@ -109,6 +109,8 @@ on the page https://www.youtube.com/html5 and check support for MSE & H.264.
 
 ## Launch tests
 
+
+### Unit Testing
 Tests are only usable from the browser for now due to dependencies on DOM
 elements. We plan to add support for `node` only tests asap.
 
@@ -116,3 +118,7 @@ elements. We plan to add support for `node` only tests asap.
 # starts a local webserver, open http://localhost:9999/webpack-dev-server/test
 make test
 ```
+
+### Functional Testing
+
+See [this document](./test/func/README.md)

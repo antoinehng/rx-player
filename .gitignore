@@ -5,3 +5,4 @@ node_modules
 dist/*
 !dist/one-player-core.js
 !dist/one-player-core.min.js
+test-output.xml
