@@ -1465,15 +1465,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return !!MediaSource_ && MediaSource_.isTypeSupported(codec);
 	}
 
-	// On IE11, we use the "progress" instead of "loadedmetadata" to set
-	// the "currentTime.
-	//
-	// Internet Explorer emits an error when setting the "currentTime"
-	// before a "progress" event sent just after the "loadedmetadata"
-	// after receiving the first init-segments. Other browsers do not
-	// even send this "progress" before receiving the first data-segment.
-	//
-	// TODO(pierre): try to find a solution without "browser sniffing"...
 	var loadedMetadataEvent = compatibleListener(["loadedmetadata"]);
 	var sourceOpenEvent = compatibleListener(["sourceopen", "webkitsourceopen"]);
 	var onEncrypted = compatibleListener(["encrypted", "needkey"]);
@@ -2001,7 +1992,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (value && typeof value.subscribe == "function") {
 	    return new Observable(function (obs) {
-	      return value.subscribe(obs);
+	      var sub = value.subscribe(function (val) {
+	        return obs.next(val);
+	      }, function (err) {
+	        return obs.error(err);
+	      }, function () {
+	        return obs.complete();
+	      });
+
+	      return function () {
+	        if (sub && sub.dispose) {
+	          sub.dispose();
+	        } else if (sub && sub.unsubscribe) {
+	          sub.unsubscribe();
+	        }
+	      };
 	    });
 	  }
 
@@ -12478,7 +12483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1194624
 	    videoElement.preload = "auto";
 
-	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha10";
+	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha11";
 	    _this.video = videoElement;
 
 	    // fullscreen change
@@ -13903,11 +13908,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function parseTimeFragment(timeFragment) {
 	  if (typeof timeFragment == "string") {
 	    timeFragment = temporalMediaFragmentParser(timeFragment);
-	  } else {
-	    timeFragment = {
-	      start: timeFragment.start,
-	      end: timeFragment.end
-	    };
+	  } else if (!timeFragment) {
+	    timeFragment = {};
 	  }
 
 	  if (typeof timeFragment.start == "string" && typeof timeFragment.end == "string") {
@@ -15822,10 +15824,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // If no dataoffset is present, we change the headers and add one
 	    var trun = new Uint8Array(oldtrun.length + 4);
 	    trun.set(itobe4(oldtrun.length + 4), 0);
-	    trun.set(oldtrun.slice(4, 16), 4); // name + (version + headers) + samplecount
+	    trun.set(oldtrun.subarray(4, 16), 4); // name + (version + headers) + samplecount
 	    trun[11] = trun[11] | 0x01; // add data offset header info
 	    trun.set([0, 0, 0, 0], 16); // data offset
-	    trun.set(oldtrun.slice(16, oldtrun.length), 20);
+	    trun.set(oldtrun.subarray(16, oldtrun.length), 20);
 	    return trun;
 	  },
 	  vmhd: function vmhd() {
