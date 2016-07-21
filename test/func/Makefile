@@ -17,10 +17,10 @@ else
 	DISPLAY := :0
 endif
 
-CHROME_STABLE ?= $(ORIGIN)/chrome/stable/
-CHROME_BETA ?= $(ORIGIN)/chrome/beta/
-CHROME_UNSTABLE ?= $(ORIGIN)/chrome/unstable/
-CHROME_BIN ?= usr/bin/google-chrome
+CHROME_STABLE ?= $(ORIGIN)/chrome-stable/
+CHROME_BETA ?= $(ORIGIN)/chrome-beta/
+CHROME_UNSTABLE ?= $(ORIGIN)/chrome-unstable/
+CHROME_BIN ?= opt/google/
 
 CHROME_BINARIES ?= $(CHROME_STABLE)$(CHROME_BIN)-stable:$(CHROME_BETA)$(CHROME_BIN)-beta:$(CHROME_UNSTABLE)$(CHROME_BIN)-unstable
 CHROMEDRIVER_PATH ?= $(ORIGIN)/chrome/driver
