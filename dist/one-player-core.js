@@ -1900,18 +1900,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var track = void 0,
 	      trackElement = void 0;
 	  var kind = "subtitles";
+	  var mode = "showing";
 	  if (isIE) {
 	    var tracksLength = video.textTracks.length;
 	    track = tracksLength > 0 ? video.textTracks[tracksLength - 1] : video.addTextTrack(kind);
-	    track.mode = track.SHOWING;
+	    track.mode = mode;
 	  } else {
 	    // there is no removeTextTrack method... so we need to reuse old
 	    // text-tracks objects and clean all its pending cues
 	    trackElement = document.createElement("track");
-	    track = trackElement.track;
-	    trackElement.kind = "subtitles";
-	    track.mode = "showing";
 	    video.appendChild(trackElement);
+	    track = trackElement.track;
+	    trackElement.kind = kind;
+	    track.mode = mode;
 	  }
 	  return { track: track, trackElement: trackElement };
 	}
@@ -6551,9 +6552,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // own, so we only try to detect when the video timestamp has not changed
 	  // between two consecutive timeupdates
 	  if (requiresMediaSource) {
-	    shouldStall = mayStall && (gap <= STALL_GAP || gap === Infinity);
+	    shouldStall = mayStall && (gap <= STALL_GAP || gap === Infinity || readyState === 1);
 
-	    shouldUnstall = prevStalled && gap < Infinity && (gap > resumeGap(prevStalled) || ending);
+	    shouldUnstall = prevStalled && readyState > 1 && gap < Infinity && (gap > resumeGap(prevStalled) || ending);
 	  } else {
 	    shouldStall = mayStall && (!paused && currentName == "timeupdate" && prevName == "timeupdate" && currentTs === prevTs || currentName == "seeking" && gap === Infinity);
 
@@ -11792,7 +11793,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Caching object used to cache initialization segments.
 	 * This allow to have a faster representation switch and seeking.
 	 */
-
 	var InitializationSegmentCache = function () {
 	  function InitializationSegmentCache() {
 	    _classCallCheck(this, InitializationSegmentCache);
@@ -12528,9 +12528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var initVideoBitrate = options.initVideoBitrate;
 	    var initAudioBitrate = options.initAudioBitrate;
 
-
 	    // auto-bindings
-
 	    var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
 
 	    _this._playPauseNext$ = _this._playPauseNext.bind(_this);
@@ -12554,7 +12552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1194624
 	    videoElement.preload = "auto";
 
-	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha11";
+	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha13";
 	    _this.video = videoElement;
 
 	    // fullscreen change
@@ -13250,8 +13248,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var END_OF_PLAY = 0.2;
 
-	// discontinuity threshold in seconds
-	var DISCONTINUITY_THRESHOLD = 1;
+	var DISCONTINUITY_THRESHOLD = 1; // discontinuity threshold in seconds
+	var FREEZE_THRESHOLD = 10; // freeze threshold in seconds
 
 	function isNativeBuffer(bufferType) {
 	  return bufferType == "audio" || bufferType == "video";
@@ -13300,6 +13298,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
+	  function addNativeSourceBuffer(mediaSource, type, codec) {
+	    if (!nativeBuffers[type]) {
+	      log.info("add sourcebuffer", codec);
+	      nativeBuffers[type] = mediaSource.addSourceBuffer(codec);
+	    }
+	    return nativeBuffers[type];
+	  }
+
 	  function createSourceBuffer(video, mediaSource, bufferInfos) {
 	    var type = bufferInfos.type;
 	    var codec = bufferInfos.codec;
@@ -13308,15 +13314,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var sourceBuffer = void 0;
 
 	    if (isNativeBuffer(type)) {
-	      if (nativeBuffers[type]) {
-	        sourceBuffer = nativeBuffers[type];
-	      } else {
-	        log.info("add sourcebuffer", codec);
-	        sourceBuffer = mediaSource.addSourceBuffer(codec);
-	        nativeBuffers[type] = sourceBuffer;
-	      }
+	      sourceBuffer = addNativeSourceBuffer(mediaSource, type, codec);
 	    } else {
-
 	      var oldSourceBuffer = customBuffers[type];
 	      if (oldSourceBuffer) {
 	        try {
@@ -13626,11 +13625,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // implementation that might drop an injected segment, or in
 	      // case of small discontinuity in the stream.
 	      if (isStalled) {
+	        var currentRange = timing.range;
 	        var nextRangeGap = timing.buffered.getNextRangeGap(timing.ts);
-	        if (nextRangeGap < DISCONTINUITY_THRESHOLD) {
-	          var seekTo = timing.ts + nextRangeGap + 1 / 60;
+
+	        // firefox fix: sometimes, the stream can be stalled, even
+	        // if we are in a buffer. This should only affect firefox
+	        // users.
+	        if (currentRange && currentRange.end - timing.ts > FREEZE_THRESHOLD) {
+	          var seekTo = timing.ts;
 	          videoElement.currentTime = seekTo;
-	          log.warn("discontinuity seek", timing.ts, nextRangeGap, seekTo);
+	          log.warn("after freeze seek", timing.ts, currentRange, seekTo);
+	        } else if (nextRangeGap < DISCONTINUITY_THRESHOLD) {
+	          var _seekTo = timing.ts + nextRangeGap + 1 / 60;
+	          videoElement.currentTime = _seekTo;
+	          log.warn("discontinuity seek", timing.ts, nextRangeGap, _seekTo);
 	        }
 	      }
 
@@ -13673,7 +13681,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  function createAdaptationsBuffers(mediaSource, manifest, timings, seekings) {
-	    var adaptationsBuffers = getAdaptations(manifest).map(function (adaptation) {
+	    var adaptations = getAdaptations(manifest);
+
+	    // Initialize all native source buffer at the same time. We cannot
+	    // lazily create native sourcebuffers since the spec does not
+	    // allow adding them during playback.
+	    //
+	    // From https://w3c.github.io/media-source/#methods
+	    //    For example, a user agent may throw a QuotaExceededError
+	    //    exception if the media element has reached the HAVE_METADATA
+	    //    readyState. This can occur if the user agent's media engine
+	    //    does not support adding more tracks during playback.
+	    adaptations.forEach(function (_ref7) {
+	      var type = _ref7.type;
+	      var codec = _ref7.codec;
+
+	      if (isNativeBuffer(type)) {
+	        addNativeSourceBuffer(mediaSource, type, codec);
+	      }
+	    });
+
+	    var adaptationsBuffers = adaptations.map(function (adaptation) {
 	      return createBuffer(mediaSource, adaptation, timings, seekings);
 	    });
 
@@ -13730,11 +13758,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var stalled = createStalled(timings, {
 	      changePlaybackRate: pipelines.requiresMediaSource()
 	    });
-	    var canPlay = createLoadedMetadata(manifest).concat(stalled);
+	    var canPlay = createLoadedMetadata(manifest);
 	    var buffers = createAdaptationsBuffers(mediaSource, manifest, timings, seekings);
 	    var mediaError = createMediaErrorStream();
 
-	    return merge(justManifest, canPlay, emeHandler, buffers, mediaError);
+	    return merge(justManifest, canPlay, stalled, emeHandler, buffers, mediaError);
 	  }
 
 	  /**
@@ -16252,7 +16280,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function extractVideoCodecs(codecPrivateData) {
 	  // we can extract codes only if fourCC is on of "H264", "X264", "DAVC", "AVC1"
-
 	  var _ref = /00000001\d7([0-9a-fA-F]{6})/.exec(codecPrivateData) || [];
 
 	  var avcProfile = _ref[1];
