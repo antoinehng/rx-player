@@ -80,7 +80,7 @@ class TextSourceBuffer extends AbstractSourceBuffer {
   _remove(from, to) {
     const track = this.track;
     const cues = track.cues;
-    for (let i = 0; i < cues.length; i++) {
+    for (let i = cues.length - 1; i >= 0; i--) {
       const cue = cues[i];
       const { startTime, endTime } = cue;
       if (startTime >= from && startTime <= to && endTime <= to) {
