@@ -1900,11 +1900,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var track = void 0,
 	      trackElement = void 0;
 	  var kind = "subtitles";
-	  var mode = "showing";
 	  if (isIE) {
 	    var tracksLength = video.textTracks.length;
 	    track = tracksLength > 0 ? video.textTracks[tracksLength - 1] : video.addTextTrack(kind);
-	    track.mode = mode;
+	    track.mode = track.SHOWING;
 	  } else {
 	    // there is no removeTextTrack method... so we need to reuse old
 	    // text-tracks objects and clean all its pending cues
@@ -1912,7 +1911,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    video.appendChild(trackElement);
 	    track = trackElement.track;
 	    trackElement.kind = kind;
-	    track.mode = mode;
+	    track.mode = "showing";
 	  }
 	  return { track: track, trackElement: trackElement };
 	}
@@ -3759,7 +3758,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    images = [images];
 	  }
 
-	  return images.map(function (_ref2) /*, size */{
+	  return images.map(function (_ref2) {
 	    var mimeType = _ref2.mimeType;
 	    var url = _ref2.url;
 
@@ -5216,10 +5215,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  "internal-error": true
 	};
 
-	// "released",
-	// "output-restricted",
-	// "output-downscaled",
-	// "status-pending",
 	function hashBuffer(buffer) {
 	  var hash = 0;
 	  var char = void 0;
@@ -11329,21 +11324,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var GC_GAP_CALM = 240;
 	var GC_GAP_BEEFY = 30;
 
-	function Buffer(_ref) // Seekings observable
-	{
+	function Buffer(_ref) {
 	  var bufferType = _ref.bufferType;
-	  var // Buffer type (audio, video, text)
-	  sourceBuffer = _ref.sourceBuffer;
-	  var // SourceBuffer object
-	  adaptation = _ref.adaptation;
-	  var // Adaptation buffered
-	  pipeline = _ref.pipeline;
-	  var // Segment pipeline
-	  adapters = _ref.adapters;
-	  var // { representations, bufferSizes } observables
-	  timings = _ref.timings;
-	  var // Timings observable
-	  seekings = _ref.seekings;
+	  var sourceBuffer = _ref.sourceBuffer;
+	  var adaptation = _ref.adaptation;
+	  var pipeline = _ref.pipeline;
+	  var adapters = _ref.adapters;
+	  var timings = _ref.timings;
+	  var seekings = _ref.seekings;
 
 
 	  var isAVBuffer = bufferType == "audio" || bufferType == "video";
@@ -12552,7 +12540,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1194624
 	    videoElement.preload = "auto";
 
-	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha13";
+	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha14";
 	    _this.video = videoElement;
 
 	    // fullscreen change
@@ -13949,7 +13937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  TextSourceBuffer.prototype._remove = function _remove(from, to) {
 	    var track = this.track;
 	    var cues = track.cues;
-	    for (var i = 0; i < cues.length; i++) {
+	    for (var i = cues.length - 1; i >= 0; i--) {
 	      var cue = cues[i];
 	      var startTime = cue.startTime;
 	      var endTime = cue.endTime;
@@ -15492,7 +15480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return request({ url: url, responseType: "arraybuffer", createXHR: createXHR });
 	      }
 	    },
-	    parser: function parser(_ref11) /*, adaptation, representation, segment */{
+	    parser: function parser(_ref11) {
 	      var response = _ref11.response;
 
 	      var responseData = response.responseData;
@@ -16292,12 +16280,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (fourCC == "AACH") {
 	    mpProfile = 5; // High Efficiency AAC Profile
 	  } else {
-	      if (codecPrivateData) {
-	        mpProfile = (parseInt(codecPrivateData.substr(0, 2), 16) & 0xF8) >> 3;
-	      } else {
-	        mpProfile = 2; // AAC Main Low Complexity
-	      }
+	    if (codecPrivateData) {
+	      mpProfile = (parseInt(codecPrivateData.substr(0, 2), 16) & 0xF8) >> 3;
+	    } else {
+	      mpProfile = 2; // AAC Main Low Complexity
 	    }
+	  }
 	  return mpProfile ? "mp4a.40." + mpProfile : "";
 	}
 
@@ -16328,17 +16316,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }];
 	}
 
-	// keyIds: [keyIdBytes],
-
-	// {
-	//   // Clearkey
-	//   // (https://dvcs.w3.org/hg/html-media/raw-file/tip/encrypted-media/cenc-format.html)
-	//   systemId: "1077efec-c0b2-4d02-ace3-3c1e52e2fb4b",
-	//   privateData: bytes.strToBytes(JSON.stringify({
-	//     kids: [bytes.toBase64URL(bytes.bytesToStr(keyIdBytes))],
-	//     type: "temporary"
-	//   }))
-	// }
 	function createSmoothStreamingParser() {
 	  var parserOptions = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -16382,8 +16359,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      keySystems: [{
 	        systemId: systemId,
 	        privateData: privateData
-	      }]. // keyIds: [keyIdBytes],
-	      concat(keySystems(keyIdBytes))
+	      }].concat(keySystems(keyIdBytes))
 	    };
 	  }
 
@@ -16755,11 +16731,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * limitations under the License.
 	 */
 
-	var rBr = /<br[^>]+>/gm;
+	var rBr = /<br.*?>/gm;
 	var rAbsTime = /^(([0-9]+):)?([0-9]+):([0-9]+)(\.([0-9]+))?$/;
 	var rRelTime = /(([0-9]+)(\.[0-9]+)?)(ms|h|m|s)/;
-
-	var escape = window.escape;
 
 	var MULTS = {
 	  h: 3600,
@@ -16855,10 +16829,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
+	  var innerHTML = node.innerHTML;
+
+	  // NOTE(compat): on IE xml nodes do not have an innerHTML property.
+	  // we have to re-serialize and re-parse as text/html to access the
+	  // <p>'s innerHTML
+	  if (innerHTML === undefined || innerHTML === null) {
+	    var serializedXML = new XMLSerializer().serializeToString(node);
+	    innerHTML = new DOMParser().parseFromString(serializedXML, "text/html").body.firstChild.innerHTML;
+	  }
+
+	  // Trim left and right whitespace from text and convert non-explicit line breaks.
+	  // Using deprecated escape all together with decodeURIComponent to convert unicode characters
+	  innerHTML = window.escape(innerHTML.replace(rBr, "\r\n"));
+
+	  // TODO(guillaume): find out if we have an encoding issue when
+	  // receiving TTML files to explain the problem with the "à"
+	  innerHTML = innerHTML.replace(/%C3%26nbsp%3B/gm, "%C3%A0");
+
 	  return {
-	    // Trim left and right whitespace from text and convert non-explicit line breaks
 	    id: node.getAttribute("xml:id") || node.getAttribute("id"),
-	    text: decodeURIComponent(escape(node.innerHTML.replace(rBr, "\n"))),
+	    text: decodeURIComponent(innerHTML),
 	    start: start, end: end
 	  };
 	}
