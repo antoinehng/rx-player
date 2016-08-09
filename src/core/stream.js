@@ -441,7 +441,7 @@ function Stream({
           // firefox fix: sometimes, the stream can be stalled, even
           // if we are in a buffer. This should only affect firefox
           // users.
-          if (currentRange && currentRange.end - timing.ts > FREEZE_THRESHOLD) {
+          if (currentRange && timing.name === "timeupdate" && currentRange.end - timing.ts > FREEZE_THRESHOLD) {
             const seekTo = timing.ts;
             videoElement.currentTime = seekTo;
             log.warn("after freeze seek", timing.ts, currentRange, seekTo);
