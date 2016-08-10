@@ -1368,6 +1368,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var isIE = navigator.appName == "Microsoft Internet Explorer" || navigator.appName == "Netscape" && /(Trident|Edge)\//.test(navigator.userAgent);
 
+	var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") !== -1;
+
 	var HAVE_METADATA = 1;
 	var HAVE_ENOUGH_DATA = 4;
 
@@ -1920,6 +1922,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return !isIE;
 	}
 
+	function isPlaybackStuck(timing) {
+	  // firefox fix: sometimes, the stream can be stalled, even if we are in a buffer.
+	  var FREEZE_THRESHOLD = 10; // video freeze threshold in seconds
+	  return isFirefox && timing.name === "timeupdate" && timing.range && timing.range.end - timing.ts > FREEZE_THRESHOLD;
+	}
+
 	// On IE11, fullscreen change events is called MSFullscreenChange
 	var onFullscreenChange = compatibleListener(["fullscreenchange", "FullscreenChange"], PREFIXES.concat("MS"));
 
@@ -1949,7 +1957,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  addTextTrack: addTextTrack,
 	  isVTTSupported: isVTTSupported,
-	  isIE: isIE
+	  isPlaybackStuck: isPlaybackStuck,
+	  isIE: isIE,
+	  isFirefox: isFirefox
 	};
 
 /***/ },
@@ -12540,7 +12550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1194624
 	    videoElement.preload = "auto";
 
-	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha14";
+	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha15";
 	    _this.video = videoElement;
 
 	    // fullscreen change
@@ -13200,6 +13210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var canPlay = _require7.canPlay;
 	var canSeek = _require7.canSeek;
 	var clearVideoSrc = _require7.clearVideoSrc;
+	var isPlaybackStuck = _require7.isPlaybackStuck;
 
 
 	var TextSourceBuffer = __webpack_require__(145);
@@ -13237,7 +13248,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var END_OF_PLAY = 0.2;
 
 	var DISCONTINUITY_THRESHOLD = 1; // discontinuity threshold in seconds
-	var FREEZE_THRESHOLD = 10; // freeze threshold in seconds
 
 	function isNativeBuffer(bufferType) {
 	  return bufferType == "audio" || bufferType == "video";
@@ -13613,20 +13623,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // implementation that might drop an injected segment, or in
 	      // case of small discontinuity in the stream.
 	      if (isStalled) {
-	        var currentRange = timing.range;
 	        var nextRangeGap = timing.buffered.getNextRangeGap(timing.ts);
 
-	        // firefox fix: sometimes, the stream can be stalled, even
-	        // if we are in a buffer. This should only affect firefox
-	        // users.
-	        if (currentRange && currentRange.end - timing.ts > FREEZE_THRESHOLD) {
-	          var seekTo = timing.ts;
-	          videoElement.currentTime = seekTo;
-	          log.warn("after freeze seek", timing.ts, currentRange, seekTo);
+	        if (isPlaybackStuck(timing)) {
+	          videoElement.currentTime = timing.ts;
+	          log.warn("after freeze seek", timing.ts, timing.range);
 	        } else if (nextRangeGap < DISCONTINUITY_THRESHOLD) {
-	          var _seekTo = timing.ts + nextRangeGap + 1 / 60;
-	          videoElement.currentTime = _seekTo;
-	          log.warn("discontinuity seek", timing.ts, nextRangeGap, _seekTo);
+	          var seekTo = timing.ts + nextRangeGap + 1 / 60;
+	          videoElement.currentTime = seekTo;
+	          log.warn("discontinuity seek", timing.ts, nextRangeGap, seekTo);
 	        }
 	      }
 
