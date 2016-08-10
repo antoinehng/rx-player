@@ -31,6 +31,7 @@ const {
   canPlay,
   canSeek,
   clearVideoSrc,
+  isPlaybackStuck,
 } = require("./compat");
 
 const TextSourceBuffer = require("./text-buffer");
@@ -56,7 +57,6 @@ const {
 const END_OF_PLAY = 0.2;
 
 const DISCONTINUITY_THRESHOLD = 1; // discontinuity threshold in seconds
-const FREEZE_THRESHOLD = 10; // freeze threshold in seconds
 
 function isNativeBuffer(bufferType) {
   return (
@@ -435,16 +435,11 @@ function Stream({
         // implementation that might drop an injected segment, or in
         // case of small discontinuity in the stream.
         if (isStalled) {
-          const currentRange = timing.range;
           const nextRangeGap = timing.buffered.getNextRangeGap(timing.ts);
 
-          // firefox fix: sometimes, the stream can be stalled, even
-          // if we are in a buffer. This should only affect firefox
-          // users.
-          if (currentRange && timing.name === "timeupdate" && currentRange.end - timing.ts > FREEZE_THRESHOLD) {
-            const seekTo = timing.ts;
-            videoElement.currentTime = seekTo;
-            log.warn("after freeze seek", timing.ts, currentRange, seekTo);
+          if (isPlaybackStuck(timing)) {
+            videoElement.currentTime = timing.ts;
+            log.warn("after freeze seek", timing.ts, timing.range);
           } else if (nextRangeGap < DISCONTINUITY_THRESHOLD) {
             const seekTo = (timing.ts + nextRangeGap + 1/60);
             videoElement.currentTime = seekTo;

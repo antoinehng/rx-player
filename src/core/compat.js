@@ -50,6 +50,10 @@ const isIE = (
   navigator.appName == "Netscape" && /(Trident|Edge)\//.test(navigator.userAgent)
 );
 
+const isFirefox = (
+  navigator.userAgent.toLowerCase().indexOf("firefox") !== -1
+);
+
 const HAVE_METADATA    = 1;
 const HAVE_ENOUGH_DATA = 4;
 
@@ -597,6 +601,17 @@ function isVTTSupported() {
   return !isIE;
 }
 
+function isPlaybackStuck(timing) {
+  // firefox fix: sometimes, the stream can be stalled, even if we are in a buffer.
+  const FREEZE_THRESHOLD = 10; // video freeze threshold in seconds
+  return (
+    isFirefox &&
+    timing.name === "timeupdate" &&
+    timing.range &&
+    timing.range.end - timing.ts > FREEZE_THRESHOLD
+  );
+}
+
 // On IE11, fullscreen change events is called MSFullscreenChange
 const onFullscreenChange = compatibleListener(["fullscreenchange", "FullscreenChange"], PREFIXES.concat("MS"));
 
@@ -626,5 +641,7 @@ module.exports = {
 
   addTextTrack,
   isVTTSupported,
+  isPlaybackStuck,
   isIE,
+  isFirefox,
 };
