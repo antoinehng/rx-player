@@ -3768,7 +3768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    images = [images];
 	  }
 
-	  return images.map(function (_ref2) {
+	  return images.map(function (_ref2) /*, size */{
 	    var mimeType = _ref2.mimeType;
 	    var url = _ref2.url;
 
@@ -5225,6 +5225,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  "internal-error": true
 	};
 
+	// "released",
+	// "output-restricted",
+	// "output-downscaled",
+	// "status-pending",
 	function hashBuffer(buffer) {
 	  var hash = 0;
 	  var char = void 0;
@@ -11334,14 +11338,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	var GC_GAP_CALM = 240;
 	var GC_GAP_BEEFY = 30;
 
-	function Buffer(_ref) {
+	function Buffer(_ref) // Seekings observable
+	{
 	  var bufferType = _ref.bufferType;
-	  var sourceBuffer = _ref.sourceBuffer;
-	  var adaptation = _ref.adaptation;
-	  var pipeline = _ref.pipeline;
-	  var adapters = _ref.adapters;
-	  var timings = _ref.timings;
-	  var seekings = _ref.seekings;
+	  var // Buffer type (audio, video, text)
+	  sourceBuffer = _ref.sourceBuffer;
+	  var // SourceBuffer object
+	  adaptation = _ref.adaptation;
+	  var // Adaptation buffered
+	  pipeline = _ref.pipeline;
+	  var // Segment pipeline
+	  adapters = _ref.adapters;
+	  var // { representations, bufferSizes } observables
+	  timings = _ref.timings;
+	  var // Timings observable
+	  seekings = _ref.seekings;
 
 
 	  var isAVBuffer = bufferType == "audio" || bufferType == "video";
@@ -12550,7 +12561,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1194624
 	    videoElement.preload = "auto";
 
-	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha15";
+	    _this.version = /*PLAYER_VERSION*/"2.0.0-alpha16";
 	    _this.video = videoElement;
 
 	    // fullscreen change
@@ -12606,8 +12617,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Player.prototype._unsubscribe = function _unsubscribe() {
 	    if (this.subscriptions) {
-	      this.subscriptions.unsubscribe();
+	      var subscriptions = this.subscriptions;
 	      this.subscriptions = null;
+	      subscriptions.unsubscribe();
 	    }
 	    this.images.next(null);
 	  };
@@ -15485,7 +15497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return request({ url: url, responseType: "arraybuffer", createXHR: createXHR });
 	      }
 	    },
-	    parser: function parser(_ref11) {
+	    parser: function parser(_ref11) /*, adaptation, representation, segment */{
 	      var response = _ref11.response;
 
 	      var responseData = response.responseData;
@@ -16285,12 +16297,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (fourCC == "AACH") {
 	    mpProfile = 5; // High Efficiency AAC Profile
 	  } else {
-	    if (codecPrivateData) {
-	      mpProfile = (parseInt(codecPrivateData.substr(0, 2), 16) & 0xF8) >> 3;
-	    } else {
-	      mpProfile = 2; // AAC Main Low Complexity
+	      if (codecPrivateData) {
+	        mpProfile = (parseInt(codecPrivateData.substr(0, 2), 16) & 0xF8) >> 3;
+	      } else {
+	        mpProfile = 2; // AAC Main Low Complexity
+	      }
 	    }
-	  }
 	  return mpProfile ? "mp4a.40." + mpProfile : "";
 	}
 
@@ -16321,6 +16333,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }];
 	}
 
+	// keyIds: [keyIdBytes],
+
+	// {
+	//   // Clearkey
+	//   // (https://dvcs.w3.org/hg/html-media/raw-file/tip/encrypted-media/cenc-format.html)
+	//   systemId: "1077efec-c0b2-4d02-ace3-3c1e52e2fb4b",
+	//   privateData: bytes.strToBytes(JSON.stringify({
+	//     kids: [bytes.toBase64URL(bytes.bytesToStr(keyIdBytes))],
+	//     type: "temporary"
+	//   }))
+	// }
 	function createSmoothStreamingParser() {
 	  var parserOptions = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -16364,7 +16387,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      keySystems: [{
 	        systemId: systemId,
 	        privateData: privateData
-	      }].concat(keySystems(keyIdBytes))
+	      }]. // keyIds: [keyIdBytes],
+	      concat(keySystems(keyIdBytes))
 	    };
 	  }
 
