@@ -189,8 +189,9 @@ class Player extends EventEmitter {
 
   _unsubscribe() {
     if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
+      const subscriptions = this.subscriptions;
       this.subscriptions = null;
+      subscriptions.unsubscribe();
     }
     this.images.next(null);
   }
