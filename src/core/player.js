@@ -185,6 +185,7 @@ class Player extends EventEmitter {
     this.evts = {};
     this.frag = { start: null, end: null };
     this.error = null;
+    this.images.next(null);
   }
 
   _unsubscribe() {
@@ -193,7 +194,6 @@ class Player extends EventEmitter {
       this.subscriptions = null;
       subscriptions.unsubscribe();
     }
-    this.images.next(null);
   }
 
   stop() {
@@ -484,7 +484,7 @@ class Player extends EventEmitter {
   }
 
   getImageTrack() {
-    return this.images;
+    return this.images.distinctUntilChanged();
   }
 
   getPlayerState() {
