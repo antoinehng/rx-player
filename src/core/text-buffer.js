@@ -66,8 +66,8 @@ class TextSourceBuffer extends AbstractSourceBuffer {
         // IE/Edge.
         const currentCues = this.track.cues;
         if (currentCues.length > 0) {
-          if (firstCue.startTime < currentCues[currentCues.length - 1].endTime) {
-            this._remove(0, +Infinity);
+          if (firstCue.startTime < currentCues[currentCues.length - 1].startTime) {
+            this._remove(firstCue.startTime, +Infinity);
           }
         }
 
