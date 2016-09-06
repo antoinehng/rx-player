@@ -332,13 +332,13 @@ function Buffer({
       );
 
     return merge(segmentsPipeline, outOfIndexStream).catch((error) => {
-      // For live adaptations, handle 412 and 404 errors as
-      // precondition-failed errors, ie: we are requesting for
-      // segments before they exist
+      // For live adaptations, handle 412 errors as precondition-
+      // failed errors, ie: we are requesting for segments before they
+      // exist
       const isPreconditionFailedError = (
         adaptation.isLive &&
-        (error.type == ErrorTypes.NETWORK_ERROR) &&
-        (error.isHttpError(412) || error.isHttpError(404))
+        error.type == ErrorTypes.NETWORK_ERROR &&
+        error.isHttpError(412)
       );
 
       if (!isPreconditionFailedError) {

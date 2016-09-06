@@ -46,7 +46,7 @@ function loaderShouldRetry(error) {
     return false;
   }
   if (error.type === RequestErrorTypes.ERROR_HTTP_CODE) {
-    return error.status >= 500;
+    return error.status >= 500 || error.status == 404;
   }
   return (
     error.type === RequestErrorTypes.TIMEOUT ||
