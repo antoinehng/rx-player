@@ -85,7 +85,7 @@ var DemoZapper = React.createClass({
       <div>
         <section id="title">
           <h1 className="title">
-            <span className="light">one-player-core</span>
+            <span className="light">rx-player</span>
           </h1>
         </section>
 

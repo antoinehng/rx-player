@@ -3,7 +3,7 @@
 Constructor will be exported in CommonJS.
 
 ```
-var Player = require('one-player-core')
+var Player = require('rx-player')
 ```
 
 #### new Player({ [videoElement] })

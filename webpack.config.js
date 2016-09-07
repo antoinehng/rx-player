@@ -1,10 +1,10 @@
 /* eslint-env node */
 const path = require("path");
 
-const ONE_PLAYER_CORE_ENV = process.env.ONE_PLAYER_CORE_ENV || "production";
+const RX_PLAYER_ENV = process.env.RX_PLAYER_ENV || "production";
 
-if (["development", "production"].indexOf(ONE_PLAYER_CORE_ENV) < 0) {
-  throw new Error("unknown ONE_PLAYER_CORE_ENV " + ONE_PLAYER_CORE_ENV);
+if (["development", "production"].indexOf(RX_PLAYER_ENV) < 0) {
+  throw new Error("unknown RX_PLAYER_ENV " + RX_PLAYER_ENV);
 }
 
 const webpack = require("webpack");
@@ -34,9 +34,9 @@ module.exports = {
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.DefinePlugin({
-      "__DEV__": ONE_PLAYER_CORE_ENV === "development",
+      "__DEV__": RX_PLAYER_ENV === "development",
       "process.env": {
-        NODE_ENV: JSON.stringify(ONE_PLAYER_CORE_ENV),
+        NODE_ENV: JSON.stringify(RX_PLAYER_ENV),
       },
     }),
   ],

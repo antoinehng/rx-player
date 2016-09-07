@@ -1,5 +1,5 @@
 {
-  "name": "one-player-core",
+  "name": "rx-player",
   "author": "Canal+",
   "version": "2.0.0-alpha17",
   "description": "Canal+ HTML5 Video Player",
@@ -12,13 +12,13 @@
     "reactive",
     "rx"
   ],
-  "browser": "./dist/one-player-core.js",
-  "homepage": "https://github.com/canalplus/one-player-core",
-  "bugs": "https://github.com/canalplus/one-player-core/issues",
+  "browser": "./dist/rx-player.js",
+  "homepage": "https://github.com/canalplus/rx-player",
+  "bugs": "https://github.com/canalplus/rx-player/issues",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/canalplus/one-player-core.git"
+    "url": "git://github.com/canalplus/rx-player.git"
   },
   "dependencies": {
     "rxjs": "5.0.0-beta.11"

@@ -3,6 +3,6 @@ node_modules
 *.keys
 
 dist/*
-!dist/one-player-core.js
-!dist/one-player-core.min.js
+!dist/rx-player.js
+!dist/rx-player.min.js
 test-output.xml
