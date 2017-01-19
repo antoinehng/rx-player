@@ -20,6 +20,8 @@ function getParameterByName(name) {
   return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+const noUI = !!getParameterByName("noui");
+
 var DemoZapper = React.createClass({
   componentDidMount() {
     var url = getParameterByName("url");
@@ -48,12 +50,14 @@ var DemoZapper = React.createClass({
     var keySystems = getKeySystems(content);
     var transport = content.transport;
     var autoPlay = content.autoPlay === false ? false : true;
+    var images = content.images;
 
     this.player.loadVideo({
       url: videoUrl,
       transport: transport,
       keySystems: keySystems,
       autoPlay: autoPlay,
+      images: images,
     });
   },
 
@@ -63,6 +67,7 @@ var DemoZapper = React.createClass({
     });
 
     this.player = player;
+    this.player.log.setLevel("DEBUG");
     this.player.addEventListener("error", function(error) {
       alert(error.message);
     });
@@ -91,7 +96,7 @@ var DemoZapper = React.createClass({
           </select>
         </section>
 
-        <DemoPlayer createPlayer={this.createPlayer} />
+        <DemoPlayer createPlayer={this.createPlayer} noUI={noUI} />
       </div>
     );
   }
