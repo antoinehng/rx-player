@@ -171,7 +171,7 @@
 	  }
 	});
 
-	window.mountDemoPlayer = function (element, props) {
+	window.mountDemoZapper = function (element, props) {
 	  return React.render(React.createElement(DemoZapper, props), element);
 	};
 
@@ -13312,7 +13312,7 @@
 	var log = __webpack_require__(32);
 
 	var _require = __webpack_require__(114),
-	    parseBaseURL = _require.parseBaseURL;
+	    normalizeBaseURL = _require.normalizeBaseURL;
 
 	var _require2 = __webpack_require__(35),
 	    isCodecSupported = _require2.isCodecSupported;
@@ -13330,6 +13330,15 @@
 	  return mimeType.split("/")[0];
 	}
 
+	function parseBaseURL(manifest) {
+	  var baseURL = normalizeBaseURL(manifest.locations[0]);
+	  var period = manifest.periods[0];
+	  if (period && period.baseURL) {
+	    baseURL += "" + period.baseURL;
+	  }
+	  return baseURL;
+	}
+
 	function normalizeManifest(location, manifest, subtitles, images) {
 	  if (!manifest.transportType) {
 	    throw new MediaError("MANIFEST_PARSE_ERROR", null, true);
@@ -13345,9 +13354,11 @@
 
 	  manifest.isLive = manifest.type == "dynamic";
 
+	  var rootURL = parseBaseURL(manifest);
+
 	  // TODO(pierre): support multi-locations/cdns
 	  var urlBase = {
-	    rootURL: parseBaseURL(manifest.locations[0]),
+	    rootURL: rootURL,
 	    baseURL: manifest.baseURL,
 	    isLive: manifest.isLive
 	  };
@@ -13906,7 +13917,7 @@
 	  return _normalizeUrl(base);
 	}
 
-	function parseBaseURL(url) {
+	function normalizeBaseURL(url) {
 	  var slash = url.lastIndexOf("/");
 	  if (slash >= 0) {
 	    return url.substring(0, slash + 1);
@@ -13917,7 +13928,7 @@
 
 	module.exports = {
 	  resolveURL: resolveURL,
-	  parseBaseURL: parseBaseURL
+	  normalizeBaseURL: normalizeBaseURL
 	};
 
 /***/ },
@@ -21967,6 +21978,10 @@
 	    );
 	  }
 	});
+
+	window.mountDemoPlayer = function (element, props) {
+	  return React.render(React.createElement(Player, props), element);
+	};
 
 	module.exports = Player;
 

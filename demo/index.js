@@ -102,6 +102,6 @@ var DemoZapper = React.createClass({
   }
 });
 
-window.mountDemoPlayer = function(element, props) {
+window.mountDemoZapper = function(element, props) {
   return React.render(<DemoZapper {...props} />, element);
 };
