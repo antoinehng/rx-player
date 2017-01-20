@@ -15,7 +15,7 @@
  */
 
 const log = require("../utils/log");
-const { parseBaseURL } = require("../utils/url");
+const { normalizeBaseURL } = require("../utils/url");
 const { isCodecSupported } = require("./compat");
 const { MediaError } = require("../errors");
 
@@ -42,6 +42,15 @@ function parseType(mimeType) {
   return mimeType.split("/")[0];
 }
 
+function parseBaseURL(manifest) {
+  let baseURL = normalizeBaseURL(manifest.locations[0]);
+  const period = manifest.periods[0];
+  if (period && period.baseURL) {
+    baseURL += "" + period.baseURL;
+  }
+  return baseURL;
+}
+
 function normalizeManifest(location, manifest, subtitles, images) {
   if (!manifest.transportType) {
     throw new MediaError("MANIFEST_PARSE_ERROR", null, true);
@@ -57,9 +66,11 @@ function normalizeManifest(location, manifest, subtitles, images) {
 
   manifest.isLive = manifest.type == "dynamic";
 
+  const rootURL = parseBaseURL(manifest);
+
   // TODO(pierre): support multi-locations/cdns
   const urlBase = {
-    rootURL: parseBaseURL(manifest.locations[0]),
+    rootURL,
     baseURL: manifest.baseURL,
     isLive: manifest.isLive,
   };
